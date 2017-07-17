@@ -1,0 +1,21 @@
+void setup()
+{
+Serial.begin(9600); //initializes serial communication between board and computer line at 9600 bits of data per second
+}
+
+void loop() //repeats function to read and print sensor voltage
+{
+float sensorVoltage;
+float sensorValue;
+sensorValue = analogRead(A0); //defines where sensorValue input is coming from
+sensorVoltage = sensorValue/1024*3.3; //Convert the analog reading (which goes from 0 - 1024) to a voltage (0 - 3.3V)
+
+Serial.print("sensor reading = "); //prints on serial monitor/serial plot
+Serial.print(sensorValue);
+Serial.println(""); //prints then moves to  new line
+Serial.print("sensor voltage = ");
+Serial.print(sensorVoltage);
+Serial.println(" V");
+
+delay(1000); //waits 1 second for next reading
+}
