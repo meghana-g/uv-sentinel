@@ -70,26 +70,26 @@ void loop() {
 
   display.println(" UV Index");
 
-  if(uvRaw<2){
+  if(uvLevel<2){
 
     display.setTextSize(2);
     display.setCursor(0,40);
     display.println(" LOW");
   }
 
-  else if(uvRaw > 2 && uvRaw <6){
+  else if(uvLevel > 2 && uvLevel <6){
     display.setTextSize(2);
     display.setCursor(0,40);
     display.println(" MOD");
   }
 
-  else if(uvRaw>5 && uvRaw<7){
+  else if(uvLevel>5 && uvLevel<7){
     display.setTextSize(2);
     display.setCursor(0,40);
     display.println(" HIGH");
   }
 
-  else if(uvRaw>7 && uvRaw<8){
+  else if(uvLevel>7 && uvLevel<8){
   display.setTextSize(2);
   display.setCursor(0,40);
   display.println(" VERY HIGH");
