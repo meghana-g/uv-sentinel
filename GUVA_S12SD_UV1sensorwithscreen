@@ -6,109 +6,147 @@
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
 
-#define LOGO16_GLCD_HEIGHT 16 
-#define LOGO16_GLCD_WIDTH  16 
+#define LOGO16_GLCD_HEIGHT 16
+#define LOGO16_GLCD_WIDTH 16
+
 static const unsigned char PROGMEM logo16_glcd_bmp[] =
 { B00000000, B11000000,
-  B00000001, B11000000,
-  B00000001, B11000000,
-  B00000011, B11100000,
-  B11110011, B11100000,
-  B11111110, B11111000,
-  B01111110, B11111111,
-  B00110011, B10011111,
-  B00011111, B11111100,
-  B00001101, B01110000,
-  B00011011, B10100000,
-  B00111111, B11100000,
-  B00111111, B11110000,
-  B01111100, B11110000,
-  B01110000, B01110000,
-  B00000000, B00110000 };
+B00000001, B11000000,
+B00000001, B11000000,
+B00000011, B11100000,
+B11110011, B11100000,
+B11111110, B11111000,
+B01111110, B11111111,
+B00110011, B10011111,
+B00011111, B11111100,
+B00001101, B01110000,
+B00011011, B10100000,
+B00111111, B11100000,
+B00111111, B11110000,
+B01111100, B11110000,
+B01110000, B01110000,
+B00000000, B00110000 };
 
 #define SSD1306_LCDHeight 64
-#if (SSD1306_LCDHEIGHT != 64)
-#error("Height incorrect, please fix Adafruit_SSD1306.h!");
-#endif
 
 int uvRaw = 0;
-int uvVolt = 0;
-int uvLevel = 0;
+int uvLevel =0;
 
 void setup() {
-   Serial.begin(9600);
 
-  // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
-  // init done
+Serial.begin(9600);
+//by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
 
-  // Show image buffer on the display hardware.
-  // Since the buffer is intialized with an Adafruit splashscreen
-  // internally, this will display the splashscreen
+//initialize with the I2C addr 0x3C (for the 128x64)
+display.begin(SSD1306_SWITCHCAPVCC, 0x3C); 
 
-  display.display();
-  delay(2000);
+//init done
 
-  // Clear the buffer.
-  display.clearDisplay();
 
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
-  display.setCursor(0,0);
-  display.println("UV meter");
-  display.display();
-  delay(2000);
-  display.clearDisplay();
-
-}
-
-void loop() {
-  uvRaw = analogRead(A0);
-  uvVolt = uvRaw * (3.3/1023); //UV raw sensor value mapped into Arduino in 1023 bins to 3.3V
-  uvLevel = (uvVolt/0.1); //V0/0.1 gets UV index
-
-  display.setTextSize(2);
-  display.setCursor(0,0);
-
-  display.println(" UV Index");
-
-  if(uvLevel<2){
-
-    display.setTextSize(2);
-    display.setCursor(0,40);
-    display.println(" LOW");
-  }
-
-  else if(uvLevel > 2 && uvLevel <6){
-    display.setTextSize(2);
-    display.setCursor(0,40);
-    display.println(" MOD");
-  }
-
-  else if(uvLevel>5 && uvLevel<7){
-    display.setTextSize(2);
-    display.setCursor(0,40);
-    display.println(" HIGH");
-  }
-
-  else if(uvLevel>7 && uvLevel<8){
-  display.setTextSize(2);
-  display.setCursor(0,40);
-  display.println(" VERY HIGH");
-  }
-
-  else{
-  display.setTextSize(2);
-  display.setCursor(0,40);
-  display.println(" EXTREME");
-  }
+//Show image buffer on the display hardware.
+//Since the buffer is intialized with an Adafruit splashscreen
+//internally, this will display the splashscreen.
 
 display.display();
 
-delay(1000);
+delay(2000);
+//Clear the buffer.
 
 display.clearDisplay();
 
+//text settings
 
+display.setTextSize(1);
+display.setTextColor(WHITE);
+display.setCursor(0,0);
+display.print("DIY UV Meter!");
+display.display();
+delay(2000);
+display.clearDisplay();
+}
+
+
+void loop() {
+  Serial.println("The loop is running.");
+  
+  uvRaw = analogRead(A0);
+
+  // the raw sensor value is maped by the Ardiuno onto 1023 bins.  To convert need to remap to 5 volts.
+  float uvVoltage = uvRaw * (5.0 / 1023.0);
+  Serial.println(uvRaw);
+
+  uvLevel = (uvVoltage/0.1);
+  Serial.println(uvLevel);
+
+  display.setTextSize(2);
+  display.setCursor(0,0);
+  display.print("UV = ");
+  display.println(uvVoltage);
+  display.display();
+  
+display.setTextSize(1);
+
+
+// Changed if/elseif statments to switch statements to make them a little more readable (maybe?)
+switch (uvLevel) {
+    case 0:
+      display.println(" NO UV"); display.display(); break;
+    case 1:
+      display.println(" LOW"); display.display(); break;
+    case 2:
+      display.println(" LOW"); display.display(); break;
+    case 3:
+      display.println(" MOD"); display.display(); break;
+    case 4:
+      display.println(" MOD"); display.display(); break;
+    case 5:
+      display.println(" HIGH"); display.display(); break;
+    case 6:
+      display.println(" HIGH"); display.display(); break;
+    case 7:
+      display.println(" HIGH"); display.display(); break;
+    case 8:
+      display.println(" EXTREME"); display.display(); break;
+    case 9:
+      display.println(" EXTREME"); display.display(); break;
+    case 10:
+      display.println(" EXTREME"); display.display(); break;
+    case 11:
+      display.println(" EXTREME"); display.display(); break;
+    case 12:
+      display.println(" EXTREME"); display.display(); break;
+    default: 
+      display.println(" ERROR"); display.display(); break;
+  }
+  
+//  if(uvLevel<2){
+//    display.setTextSize(2);
+//    display.println(" LOW");
+//
+//  }
+//  else if(uvLevel > 2 && uvLevel <6){
+//    display.setTextSize(2);
+//    display.println(" MOD");
+//  }
+//  else if(uvLevel>5 && uvLevel<7){
+//    display.setTextSize(2);  
+//    display.println(" HIGH");
+//  }
+//  else if(uvLevel>5 && uvLevel<8){
+//    display.setTextSize(2);
+//    display.println(" VERY HIGH");
+//  }
+//  else if(uvLevel>8 && uvLevel<14){
+//    display.setTextSize(2);
+//    display.println(" EXTREME");
+//  }
+//  else {
+//    display.setTextSize(2);
+//    display.println(" ERROR");
+//    display.display();
+//  }
+
+  delay(1000);
+  display.clearDisplay();
 
 }
