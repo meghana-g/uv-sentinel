@@ -71,8 +71,8 @@ void loop() {
   
   uvRaw = analogRead(A0);
 
-  // the raw sensor value is maped by the Ardiuno onto 1023 bins.  To convert need to remap to 5 volts.
-  float uvVoltage = uvRaw * (5.0 / 1023.0);
+  // the raw sensor value is maped by the Ardiuno onto 1023 bins.  To convert need to remap to 3.3 volts.
+  float uvVoltage = uvRaw * (3.3 / 1023.0);
   Serial.println(uvRaw);
 
   uvLevel = (uvVoltage/0.1);
