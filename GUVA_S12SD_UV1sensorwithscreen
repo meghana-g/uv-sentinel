@@ -32,6 +32,7 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
 #endif
 
 int uvRaw = 0;
+int uvVolt = 0;
 int uvLevel = 0;
 
 void setup() {
@@ -63,7 +64,8 @@ void setup() {
 
 void loop() {
   uvRaw = analogRead(A0);
-  uvLevel = (uvRaw/0.1);
+  uvVolt = uvRaw * (3.3/1023); //UV raw sensor value mapped into Arduino in 1023 bins to 3.3V
+  uvLevel = (uvVolt/0.1); //V0/0.1 gets UV index
 
   display.setTextSize(2);
   display.setCursor(0,0);
