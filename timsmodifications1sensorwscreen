@@ -32,9 +32,14 @@ B00000000, B00110000 };
 
 float uvTotal = 0;
 
+int UVSensor1 = A0; //added pin for UV Sensor 1
+int UVSensor2 = A1; //added pin for UV Sensor 2
+
 
 void setup() {
 
+pinMode(UVSensor1, INPUT); //added pinMode for UVSensor1
+pinMode(UVSensor2, INPUT); //added pinMode for UVSensor 2
 Serial.begin(9600);
 //by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
 
@@ -64,6 +69,7 @@ display.print("DIY UV Meter!");
 display.display();
 delay(2000);
 display.clearDisplay();
+
 }
 
 
@@ -74,7 +80,7 @@ void loop() {
 
   Serial.println("The loop is running.");
   
-  uvRaw = analogRead(A0);
+  uvRaw = analogRead(UVSensor1) + analogRead(UVSensor2); //changed analogRead(A0) to analogRead(UVSensor1) and added + analogRead(UVSensor2) but I'm not sure if you can actually do this
   
 
   // the raw sensor value is maped by the Ardiuno onto 1023 bins.  To convert need to remap to 5 volts.
