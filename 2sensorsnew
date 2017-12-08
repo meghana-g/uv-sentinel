@@ -1,0 +1,195 @@
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
+#define LOGO16_GLCD_HEIGHT 16
+#define LOGO16_GLCD_WIDTH 16
+
+static const unsigned char PROGMEM logo16_glcd_bmp[] =
+{ B00000000, B11000000,
+B00000001, B11000000,
+B00000001, B11000000,
+B00000011, B11100000,
+B11110011, B11100000,
+B11111110, B11111000,
+B01111110, B11111111,
+B00110011, B10011111,
+B00011111, B11111100,
+B00001101, B01110000,
+B00011011, B10100000,
+B00111111, B11100000,
+B00111111, B11110000,
+B01111100, B11110000,
+B01110000, B01110000,
+B00000000, B00110000 };
+
+#define SSD1306_LCDHeight 64
+
+
+float uvTotal = 0;
+
+int UVSensor1 = A0; //added pin for UV Sensor 1
+int UVSensor2 = A1; //added pin for UV Sensor 2
+
+
+void setup() {
+pinMode(UVSensor1, INPUT); //added pinMode for UVSensor1
+pinMode(UVSensor2, INPUT); //added pinMode for UVSensor 2
+
+Serial.begin(9600);
+//by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
+
+//initialize with the I2C addr 0x3C (for the 128x64)
+display.begin(SSD1306_SWITCHCAPVCC, 0x3C); 
+
+//init done
+
+
+//Show image buffer on the display hardware.
+//Since the buffer is intialized with an Adafruit splashscreen
+//internally, this will display the splashscreen.
+
+display.display();
+
+delay(2000);
+//Clear the buffer.
+
+display.clearDisplay();
+
+//text settings
+
+display.setTextSize(1);
+display.setTextColor(WHITE);
+display.setCursor(0,0);
+display.print("DIY UV Meter!");
+display.display();
+delay(2000);
+display.clearDisplay();
+}
+
+
+void loop() {
+
+  int uvRaw = 0;
+  int uvLevel =0;
+
+  Serial.println("The loop is running.");
+  
+  //uvRaw1 = analogRead(A0);
+  //uvRaw = analogRead(UVSensor1) + analogRead(UVSensor2); //changed analogRead(A0) to analogRead(UVSensor1) and added + analogRead(UVSensor2) but I'm not sure if you can actually do this--Michaela
+  uvRaw1 = analogRead(UVSensor1)
+  uvRaw2 = analogRead(UVSensor2)
+  //changed uvRaw that was an average to 2 different raw values that will be displayed on the screen based on with sensor one at A0 and sensor 2 at A1
+ 
+  // the raw sensor value is maped by the Ardiuno onto 1023 bins.  To convert need to remap to 5 volts.
+  float uvVoltage1 = uvRaw1 * (5 / 1023.0);
+  float uvCurrent1 = uvVoltage1/4.3;      // Vo = 4.3 * Diode-Current-in-uA
+  float uvApower1 = (uvCurrent1*1000) / 113;  // Photocurrent(nA) = 113 X UV Power(mW/cm^2)
+ float uvVoltage2 = uvRaw2 * (5 / 1023.0);
+  float uvCurrent2 = uvVoltage2/4.3;      // Vo = 4.3 * Diode-Current-in-uA
+  float uvApower2 = (uvCurrent2*1000) / 113;  // Photocurrent(nA) = 113 X UV Power(mW/cm^2)
+  uvTotal = uvTotal + ((uvApower1 + uvApower2)/2);
+  
+  // did not change calculations but allows for calculations of both sensor values 
+  
+  Serial.println(uvRaw);
+
+  float uvIndex1 = (uvVoltage1*10);
+  float uvIndex2 = (uvVoltage2*10);
+  Serial.println(uvLevel);
+  
+  //doubled all variables in order to display values from both sensors
+
+  display.setTextSize(1);
+  display.setCursor(0,0);
+  display.print("uvRaw1:");
+  display.print(uvRaw1);
+   display.print("uvRaw2:");
+  display.print(uvRaw2);
+  display.print(" uvVolt1:");
+  display.println(uvVoltage1);
+  display.print(" uvVolt2:");
+  display.println(uvVoltage2);
+  display.print("uvPow1:");
+  display.print(uvApower1);
+   display.print("uvPow2:");
+  display.print(uvApower2);
+  display.print(" total: ");
+  display.println(uvTotal);
+  display.print("Index1= ");
+  display.print(uvIndex1);
+   display.print("Index2= ");
+  display.print(uvIndex2);
+  display.display();
+  
+int uvInt = 0;
+
+// Changed if/elseif statments to switch statements to make them a little more readable (maybe?)
+
+uvInt = (int) uvLevel; // now the UV level is truncated to no decimels
+switch (uvInt) {
+    case 0:
+      display.println(" NO UV Detected"); display.display(); break;
+    case 1:
+      display.println(" LOW"); display.display(); break;
+    case 2:
+      display.println(" LOW"); display.display(); break;
+    case 3:
+      display.println(" MOD"); display.display(); break;
+    case 4:
+      display.println(" MOD"); display.display(); break;
+    case 5:
+      display.println(" HIGH"); display.display(); break;
+    case 6:
+      display.println(" HIGH"); display.display(); break;
+    case 7:
+      display.println(" HIGH"); display.display(); break;
+    case 8:
+      display.println(" EXTREME"); display.display(); break;
+    case 9:
+      display.println(" EXTREME"); display.display(); break;
+    case 10:
+      display.println(" EXTREME"); display.display(); break;
+    case 11:
+      display.println(" EXTREME"); display.display(); break;
+    case 12:
+      display.println(" EXTREME"); display.display(); break;
+    default: 
+      display.println(" ERROR"); display.display(); break;
+  }
+//  
+//  if(uvLevel<2){
+//    display.setTextSize(2);
+//    display.println(" LOW");
+//
+//  }
+//  else if(uvLevel > 2 && uvLevel <6){
+//    display.setTextSize(2);
+//    display.println(" MOD");
+//  }
+//  else if(uvLevel>5 && uvLevel<7){
+//    display.setTextSize(2);  
+//    display.println(" HIGH");
+//  }
+//  else if(uvLevel>5 && uvLevel<8){
+//    display.setTextSize(2);
+//    display.println(" VERY HIGH");
+//  }
+//  else if(uvLevel>8 && uvLevel<14){
+//    display.setTextSize(2);
+//    display.println(" EXTREME");
+//  }
+//  else {
+//    display.setTextSize(2);
+//    display.println(" ERROR");
+//    display.display();
+//  }
+
+  delay(1000);
+  display.clearDisplay();
+
+}
